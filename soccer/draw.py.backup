@@ -5,7 +5,6 @@ import norfair
 import numpy as np
 import PIL
 from PIL import ImageDraw, ImageFont
-from PIL import ImageDraw, ImageFont
 
 
 class Draw:

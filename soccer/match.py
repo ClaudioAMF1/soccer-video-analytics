@@ -9,13 +9,13 @@ from soccer.draw import Draw
 from soccer.pass_event import Pass, PassEvent
 from soccer.player import Player
 from soccer.team import Team
+from soccer.tactical_visualization import TacticalVisualization
 
 
 class Match:
     def __init__(self, home: Team, away: Team, fps: int = 30):
         """
-
-        Initialize Match
+        Initialize Match with enhanced tactical analysis
 
         Parameters
         ----------
@@ -41,11 +41,19 @@ class Match:
         self.fps = fps
         # Pass detection
         self.pass_event = PassEvent()
+        
+        # Tactical visualization
+        self.tactical_viz = TacticalVisualization()
+        
+        # Configurações de visualização tática
+        self.show_formation_lines = True
+        self.show_formation_polygons = True
+        self.show_ball_trail = True
+        self.show_tactical_info = True
 
     def update(self, players: List[Player], ball: Ball):
         """
-
-        Update match possession and closest player
+        Update match possession and closest player with enhanced tactical analysis
 
         Parameters
         ----------
@@ -54,7 +62,6 @@ class Match:
         ball : Ball
             Ball
         """
-
         self.update_possession()
 
         if ball is None or ball.detection is None:
@@ -63,8 +70,14 @@ class Match:
 
         self.ball = ball
 
-        closest_player = min(players, key=lambda player: player.distance_to_ball(ball))
+        # Filtra jogadores válidos (com detecção)
+        valid_players = [p for p in players if p.detection is not None]
+        
+        if not valid_players:
+            self.closest_player = None
+            return
 
+        closest_player = min(valid_players, key=lambda player: player.distance_to_ball(ball))
         self.closest_player = closest_player
 
         ball_distance = closest_player.distance_to_ball(ball)
@@ -88,12 +101,10 @@ class Match:
 
         # Pass detection
         self.pass_event.update(closest_player=closest_player, ball=ball)
-
         self.pass_event.process_pass()
 
     def change_team(self, team: Team):
         """
-
         Change team possession
 
         Parameters
@@ -112,6 +123,29 @@ class Match:
 
         self.team_possession.possession += 1
         self.duration += 1
+
+    def get_tactical_stats(self) -> dict:
+        """
+        Retorna estatísticas táticas do jogo
+        
+        Returns
+        -------
+        dict
+            Dicionário com estatísticas táticas
+        """
+        stats = {
+            'duration': self.duration,
+            'home_possession': self.home.possession,
+            'away_possession': self.away.possession,
+            'home_passes': len(self.home.passes),
+            'away_passes': len(self.away.passes),
+            'total_passes': len(self.passes),
+            'possession_ratio': {
+                'home': self.home.get_percentage_possession(self.duration),
+                'away': self.away.get_percentage_possession(self.duration)
+            }
+        }
+        return stats
 
     @property
     def home_possession_str(self) -> str:
@@ -132,8 +166,89 @@ class Match:
     def passes(self) -> List["Pass"]:
         home_passes = self.home.passes
         away_passes = self.away.passes
-
         return home_passes + away_passes
+
+    def draw_tactical_visualization(self, frame: PIL.Image.Image, players: List[Player]) -> PIL.Image.Image:
+        """
+        Desenha visualização tática completa
+        
+        Parameters
+        ----------
+        frame : PIL.Image.Image
+            Frame do vídeo
+        players : List[Player]
+            Lista de jogadores
+            
+        Returns
+        -------
+        PIL.Image.Image
+            Frame com visualização tática
+        """
+        teams = [self.home, self.away]
+        
+        # Aplica visualização tática usando a classe especializada
+        frame = self.tactical_viz.draw_tactical_analysis(
+            img=frame,
+            players=players,
+            ball=self.ball,
+            teams=teams,
+            team_possession=self.team_possession
+        )
+        
+        return frame
+
+    def draw_enhanced_info_panel(self, frame: PIL.Image.Image) -> PIL.Image.Image:
+        """
+        Desenha painel de informações táticas aprimorado
+        
+        Parameters
+        ----------
+        frame : PIL.Image.Image
+            Frame do vídeo
+            
+        Returns
+        -------
+        PIL.Image.Image
+            Frame com painel de informações
+        """
+        if not self.show_tactical_info:
+            return frame
+            
+        # Painel de informações táticas
+        panel_width = 300
+        panel_height = 200
+        panel_x = frame.size[0] - panel_width - 20
+        panel_y = frame.size[1] - panel_height - 20
+        
+        # Background do painel
+        draw = PIL.ImageDraw.Draw(frame, "RGBA")
+        panel_bg = (0, 0, 0, 180)
+        draw.rectangle([panel_x, panel_y, panel_x + panel_width, panel_y + panel_height], 
+                      fill=panel_bg, outline=(255, 255, 255, 200), width=2)
+        
+        # Informações táticas
+        stats = self.get_tactical_stats()
+        
+        info_texts = [
+            f"Duração: {stats['duration']//self.fps//60:02d}:{(stats['duration']//self.fps)%60:02d}",
+            f"Posse {self.home.abbreviation}: {stats['possession_ratio']['home']*100:.1f}%",
+            f"Posse {self.away.abbreviation}: {stats['possession_ratio']['away']*100:.1f}%",
+            f"Passes {self.home.abbreviation}: {stats['home_passes']}",
+            f"Passes {self.away.abbreviation}: {stats['away_passes']}",
+            f"Time na posse: {self.team_possession.name if self.team_possession else 'N/A'}",
+        ]
+        
+        # Desenha textos
+        y_offset = 15
+        for i, text in enumerate(info_texts):
+            frame = Draw.draw_text(
+                img=frame,
+                origin=(panel_x + 10, panel_y + 10 + i * y_offset),
+                text=text,
+                color=(255, 255, 255)
+            )
+        
+        return frame
 
     def possession_bar(self, frame: PIL.Image.Image, origin: tuple) -> PIL.Image.Image:
         """
@@ -151,7 +266,6 @@ class Match:
         PIL.Image.Image
             Frame with possession bar
         """
-
         bar_x = origin[0]
         bar_y = origin[1]
         bar_height = 29
@@ -229,32 +343,8 @@ class Match:
         right_rectangle: tuple,
         right_color: tuple,
     ) -> PIL.Image.Image:
-        """Draw counter rectangle for both teams
-
-        Parameters
-        ----------
-        frame : PIL.Image.Image
-            Video frame
-        ratio : float
-            counter proportion
-        left_rectangle : tuple
-            rectangle for the left team in counter
-        left_color : tuple
-            color for the left team in counter
-        right_rectangle : tuple
-            rectangle for the right team in counter
-        right_color : tuple
-            color for the right team in counter
-
-        Returns
-        -------
-        PIL.Image.Image
-            Drawed video frame
-        """
-
-        # Draw first one rectangle or another in orther to make the
-        # rectangle bigger for better rounded corners
-
+        """Draw counter rectangle for both teams"""
+        # [Previous implementation remains the same]
         if ratio < 0.15:
             left_rectangle[1][0] += 20
 
@@ -293,22 +383,8 @@ class Match:
         return frame
 
     def passes_bar(self, frame: PIL.Image.Image, origin: tuple) -> PIL.Image.Image:
-        """
-        Draw passes bar
-
-        Parameters
-        ----------
-        frame : PIL.Image.Image
-            Frame
-        origin : tuple
-            Origin (x, y)
-
-        Returns
-        -------
-        PIL.Image.Image
-            Frame with passes bar
-        """
-
+        """Draw passes bar"""
+        # [Previous implementation remains the same]
         bar_x = origin[0]
         bar_y = origin[1]
         bar_height = 29
@@ -347,8 +423,6 @@ class Match:
         left_color = self.home.board_color
         right_color = self.away.board_color
 
-        # Draw first one rectangle or another in orther to make the
-        # rectangle bigger for better rounded corners
         frame = self.draw_counter_rectangle(
             frame=frame,
             ratio=ratio,
@@ -386,18 +460,9 @@ class Match:
 
         return frame
 
-    def get_possession_background(
-        self,
-    ) -> PIL.Image.Image:
-        """
-        Get possession counter background
-
-        Returns
-        -------
-        PIL.Image.Image
-            Counter background
-        """
-
+    def get_possession_background(self) -> PIL.Image.Image:
+        """Get possession counter background"""
+        # [Previous implementation remains the same]
         counter = PIL.Image.open("./images/possession_board.png").convert("RGBA")
         counter = Draw.add_alpha(counter, 210)
         counter = np.array(counter)
@@ -409,15 +474,8 @@ class Match:
         return counter
 
     def get_passes_background(self) -> PIL.Image.Image:
-        """
-        Get passes counter background
-
-        Returns
-        -------
-        PIL.Image.Image
-            Counter background
-        """
-
+        """Get passes counter background"""
+        # [Previous implementation remains the same]
         counter = PIL.Image.open("./images/passes_board.png").convert("RGBA")
         counter = Draw.add_alpha(counter, 210)
         counter = np.array(counter)
@@ -434,23 +492,7 @@ class Match:
         origin: tuple,
         counter_background: PIL.Image.Image,
     ) -> PIL.Image.Image:
-        """
-        Draw counter background
-
-        Parameters
-        ----------
-        frame : PIL.Image.Image
-            Frame
-        origin : tuple
-            Origin (x, y)
-        counter_background : PIL.Image.Image
-            Counter background
-
-        Returns
-        -------
-        PIL.Image.Image
-            Frame with counter background
-        """
+        """Draw counter background"""
         frame.paste(counter_background, origin, counter_background)
         return frame
 
@@ -465,34 +507,7 @@ class Match:
         height: int = 27,
         width: int = 120,
     ) -> PIL.Image.Image:
-        """
-        Draw counter
-
-        Parameters
-        ----------
-        frame : PIL.Image.Image
-            Frame
-        text : str
-            Text in left-side of counter
-        counter_text : str
-            Text in right-side of counter
-        origin : tuple
-            Origin (x, y)
-        color : tuple
-            Color
-        text_color : tuple
-            Color of text
-        height : int, optional
-            Height, by default 27
-        width : int, optional
-            Width, by default 120
-
-        Returns
-        -------
-        PIL.Image.Image
-            Frame with counter
-        """
-
+        """Draw counter"""
         team_begin = origin
         team_width_ratio = 0.417
         team_width = width * team_width_ratio
@@ -546,18 +561,7 @@ class Match:
         return frame
 
     def draw_debug(self, frame: PIL.Image.Image) -> PIL.Image.Image:
-        """Draw line from closest player feet to ball
-
-        Parameters
-        ----------
-        frame : PIL.Image.Image
-            Video frame
-
-        Returns
-        -------
-        PIL.Image.Image
-            Drawed video frame
-        """
+        """Draw line from closest player feet to ball"""
         if self.closest_player and self.ball:
             closest_foot = self.closest_player.closest_foot_to_ball(self.ball)
 
@@ -584,8 +588,7 @@ class Match:
         debug: bool = False,
     ) -> PIL.Image.Image:
         """
-
-        Draw elements of the possession in frame
+        Draw elements of the possession in frame with enhanced tactical visualization
 
         Parameters
         ----------
@@ -601,7 +604,6 @@ class Match:
         PIL.Image.Image
             Frame with elements of the match
         """
-
         # get width of PIL.Image
         frame_width = frame.size[0]
         counter_origin = (frame_width - 540, 40)
@@ -651,8 +653,7 @@ class Match:
         debug: bool = False,
     ) -> PIL.Image.Image:
         """
-
-        Draw elements of the passes in frame
+        Draw elements of the passes in frame with enhanced tactical visualization
 
         Parameters
         ----------
@@ -668,7 +669,6 @@ class Match:
         PIL.Image.Image
             Frame with elements of the match
         """
-
         # get width of PIL.Image
         frame_width = frame.size[0]
         counter_origin = (frame_width - 540, 40)
@@ -710,3 +710,24 @@ class Match:
             frame = self.draw_debug(frame=frame)
 
         return frame
+
+    def toggle_formation_lines(self):
+        """Liga/desliga linhas de formação"""
+        self.show_formation_lines = not self.show_formation_lines
+        self.tactical_viz.formation_lines_enabled = self.show_formation_lines
+
+    def toggle_formation_polygons(self):
+        """Liga/desliga polígonos de formação"""
+        self.show_formation_polygons = not self.show_formation_polygons
+        self.tactical_viz.formation_polygons_enabled = self.show_formation_polygons
+
+    def toggle_ball_trail(self):
+        """Liga/desliga rastro da bola"""
+        self.show_ball_trail = not self.show_ball_trail
+        self.tactical_viz.ball_trail_enabled = self.show_ball_trail
+        if self.ball:
+            self.ball.trail_enabled = self.show_ball_trail
+
+    def toggle_tactical_info(self):
+        """Liga/desliga painel de informações táticas"""
+        self.show_tactical_info = not self.show_tactical_info

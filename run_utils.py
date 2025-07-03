@@ -10,7 +10,7 @@ from soccer import Ball, Match
 
 
 def get_ball_detections(
-    ball_detector: YoloV5, frame: np.ndarray
+    ball_detector: YoloV5, frame: np.ndarray, use_sports_ball: bool = False
 ) -> List[norfair.Detection]:
     """
     Uses custom Yolov5 detector in order
@@ -23,6 +23,8 @@ def get_ball_detections(
         YoloV5 detector for balls
     frame : np.ndarray
         Frame to get the ball detections from
+    use_sports_ball : bool
+        Whether to use 'sports ball' class from COCO instead of custom model
 
     Returns
     -------
@@ -30,7 +32,32 @@ def get_ball_detections(
         List of ball detections
     """
     ball_df = ball_detector.predict(frame)
-    ball_df = ball_df[ball_df["confidence"] > 0.3]
+    
+    if use_sports_ball:
+        # Filtrar apenas objetos da classe 'sports ball' (classe 32 no COCO)
+        # Primeiro tentar por nome da classe
+        if 'name' in ball_df.columns:
+            ball_df = ball_df[ball_df["name"].str.contains("ball", case=False, na=False)]
+        # Se não funcionar, tentar por ID da classe (32 = sports ball no COCO)
+        elif 'class' in ball_df.columns:
+            ball_df = ball_df[ball_df["class"] == 32]
+        
+        print(f"🔍 Detectadas {len(ball_df)} bolas esportivas no frame")
+    
+    # Filtrar por confiança
+    confidence_threshold = 0.3 if use_sports_ball else 0.5
+    ball_df = ball_df[ball_df["confidence"] > confidence_threshold]
+    
+    # Se não encontrou bola com o threshold padrão, tentar com threshold menor
+    if len(ball_df) == 0 and use_sports_ball:
+        ball_df = ball_detector.predict(frame)
+        if 'name' in ball_df.columns:
+            ball_df = ball_df[ball_df["name"].str.contains("ball", case=False, na=False)]
+        elif 'class' in ball_df.columns:
+            ball_df = ball_df[ball_df["class"] == 32]
+        ball_df = ball_df[ball_df["confidence"] > 0.1]  # Threshold muito baixo
+        print(f"🔍 Com threshold baixo: {len(ball_df)} bolas detectadas")
+    
     return Converter.DataFrame_to_Detections(ball_df)
 
 
@@ -47,7 +74,7 @@ def get_player_detections(
     person_detector : YoloV5
         YoloV5 detector
     frame : np.ndarray
-        _description_
+        Frame to process
 
     Returns
     -------
@@ -56,15 +83,23 @@ def get_player_detections(
     """
 
     person_df = person_detector.predict(frame)
-    person_df = person_df[person_df["name"] == "person"]
+    
+    # Filtrar apenas pessoas
+    if 'name' in person_df.columns:
+        person_df = person_df[person_df["name"] == "person"]
+    # Se não tem coluna 'name', tentar por classe (0 = person no COCO)
+    elif 'class' in person_df.columns:
+        person_df = person_df[person_df["class"] == 0]
+    
     person_df = person_df[person_df["confidence"] > 0.35]
     person_detections = Converter.DataFrame_to_Detections(person_df)
+    
+    print(f"👥 Detectadas {len(person_detections)} pessoas no frame")
     return person_detections
 
 
 def create_mask(frame: np.ndarray, detections: List[norfair.Detection]) -> np.ndarray:
     """
-
     Creates mask in order to hide detections and goal counter for motion estimation
 
     Parameters
@@ -119,7 +154,6 @@ def update_motion_estimator(
     frame: np.ndarray,
 ) -> "CoordinatesTransformation":
     """
-
     Update coordinate transformations every frame
 
     Parameters
@@ -167,6 +201,9 @@ def get_main_ball(detections: List[Detection], match: Match = None) -> Ball:
         ball.set_color(match)
 
     if detections:
-        ball.detection = detections[0]
+        # Pegar a detecção com maior confiança
+        best_detection = max(detections, key=lambda d: d.data.get("p", 0))
+        ball.detection = best_detection
+        print(f"⚽ Bola detectada com confiança: {best_detection.data.get('p', 0):.2f}")
 
     return ball
