@@ -140,9 +140,9 @@ Este projeto cumpre com sucesso todos os requisitos obrigatórios e desejáveis,
 
 ## Trabalho Final
 
-**Aluno:** *Seu Nome Aqui*  
+**Aluno:** *Claudio Meireles*  
 **Disciplina:** Processamento Inteligente de Imagens Aeroespaciais  
-**Universidade:** *Sua Universidade*  
+**Universidade:** *IDP*  
 **Ano:** 2025
 
 ---
