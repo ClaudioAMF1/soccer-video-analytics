@@ -133,7 +133,7 @@ Este projeto cumpre com sucesso todos os requisitos obrigatórios e desejáveis,
 
 ## Trabalho Final
 
-**Aluno:** *Claudio Meireles*  
+**Alunos:** *Andreia, Claudio Filho, Kelwin Menezes, Felipe Pereira,Laura Menezes, Lucas Ungarelli, Pedro Araújo*  
 **Disciplina:** Processamento Inteligente de Imagens Aeroespaciais  
 **Universidade:** *IDP*  
 **Ano:** 2025
