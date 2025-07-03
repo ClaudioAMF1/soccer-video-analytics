@@ -89,13 +89,6 @@ python analise_video.py --tatico
 
 O vídeo processado será guardado na pasta raiz do projeto com o sufixo `_out.mp4`.
 
-## Exemplo do Resultado
-
-O vídeo final apresentará o jogo original com as seguintes camadas de informação sobrepostas, permitindo uma análise tática clara e imediata:
-
-![Exemplo de Análise Tática](image_fd8098.jpg)
-
-*(Nesta imagem, podemos ver os polígonos de formação, as linhas de conexão, as caixas delimitadoras coloridas e o ponteiro de posse no jogador do Palmeiras.)*
 
 ## Detalhes Técnicos
 
