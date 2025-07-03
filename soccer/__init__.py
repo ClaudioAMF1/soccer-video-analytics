@@ -1,6 +1,7 @@
-from .ball import Ball
-from .draw import Draw
-from .match import Match
-from .player import Player
-from .team import Team
-from .tactical_visualization import TacticalVisualization
+# soccer/__init__.py
+from .bola import Bola
+from .desenho import Desenho
+from .partida import Partida
+from .jogador import Jogador
+from .time import Time
+from .visualizacao_tatica import VisualizacaoTatica
