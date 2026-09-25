@@ -8,24 +8,44 @@ from inference import Converter, Detector
 from soccer.bola import Bola
 from soccer.partida import Partida
 
-def obter_deteccoes_bola(detector_bola: Detector, frame: np.ndarray, usar_bola_esportiva: bool = False) -> List[Detection]:
-    df_bola = detector_bola.predict(frame)
-    if usar_bola_esportiva and not df_bola.empty:
-        if 'name' in df_bola.columns:
-            df_bola = df_bola[df_bola["name"] == "sports ball"]
-        elif 'class' in df_bola.columns:
-            df_bola = df_bola[df_bola["class"] == 32]
-    # Limiar de confiança da bola REDUZIDO para aumentar a detecção
-    return Converter.DataFrame_to_Detections(df_bola[df_bola["confidence"] > 0.15])
+# Limiares de confianca; o da bola e baixo porque o detector COCO tem
+# dificuldade com objetos pequenos. O experimento E1 questiona esse paliativo.
+LIMIAR_BOLA = 0.15
+LIMIAR_PESSOA = 0.40
 
-def obter_deteccoes_jogadores(detector_pessoas: Detector, frame: np.ndarray) -> List[Detection]:
-    df_pessoas = detector_pessoas.predict(frame)
-    if not df_pessoas.empty:
-        if 'name' in df_pessoas.columns:
-            df_pessoas = df_pessoas[df_pessoas["name"] == "person"]
-        elif 'class' in df_pessoas.columns:
-            df_pessoas = df_pessoas[df_pessoas["class"] == 0]
-    return Converter.DataFrame_to_Detections(df_pessoas[df_pessoas["confidence"] > 0.4])
+def _filtrar(df, nome_classe: str, id_classe: int, limiar: float) -> List[Detection]:
+    """Filtra por classe e confiança, tolerando o caso sem nenhuma detecção.
+
+    `Detector.predict` devolve um DataFrame vazio e *sem colunas* quando o
+    modelo não encontra nada no quadro; indexar por "confidence" nesse caso
+    levantava KeyError e derrubava a execução em qualquer corte de câmera,
+    replay ou tela de placar.
+    """
+    if df is None or df.empty:
+        return []
+    if "name" in df.columns:
+        df = df[df["name"] == nome_classe]
+    elif "class" in df.columns:
+        df = df[df["class"] == id_classe]
+    if df.empty or "confidence" not in df.columns:
+        return []
+    return Converter.DataFrame_to_Detections(df[df["confidence"] > limiar])
+
+
+def obter_deteccoes_bola(detector_bola: Detector, frame: np.ndarray,
+                         usar_bola_esportiva: bool = False,
+                         limiar: float = LIMIAR_BOLA) -> List[Detection]:
+    df = detector_bola.predict(frame)
+    if not usar_bola_esportiva:
+        if df is None or df.empty or "confidence" not in df.columns:
+            return []
+        return Converter.DataFrame_to_Detections(df[df["confidence"] > limiar])
+    return _filtrar(df, "sports ball", 32, limiar)
+
+
+def obter_deteccoes_jogadores(detector_pessoas: Detector, frame: np.ndarray,
+                              limiar: float = LIMIAR_PESSOA) -> List[Detection]:
+    return _filtrar(detector_pessoas.predict(frame), "person", 0, limiar)
 
 def criar_mascara(frame: np.ndarray, deteccoes: List[Detection]) -> np.ndarray:
     mascara = np.ones(frame.shape[:2], dtype=frame.dtype)
