@@ -1,0 +1,82 @@
+:root {
+  --fundo: #F3F4F1;
+  --superficie: #FFFFFF;
+  --tinta: #17201C;
+  --tinta-2: #45524D;
+  --suave: #6C7874;
+  --borda: #D8DDD9;
+  --destaque: #1F5F4E;
+  --gramado: #2C5A3E;
+  --gramado-escuro: #1F4630;
+  --foco: #1F5F4E;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0F1512; --superficie: #17201C; --tinta: #E8EDEA; --tinta-2: #B9C4BF;
+    --suave: #8C9A94; --borda: #2A3632; --destaque: #6FC7A8; --foco: #6FC7A8;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--fundo); color: var(--tinta);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 0 20px 40px;
+}
+.topo {
+  max-width: 1320px; margin: 0 auto; padding: 24px 0 18px;
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between;
+}
+.rotulo { margin: 0; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--suave); }
+h1 { margin: 2px 0 0; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; }
+h2 { margin: 0 0 10px; font-size: 1rem; }
+.arquivos { display: flex; flex-wrap: wrap; gap: 8px; }
+.arquivos input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.botao-arquivo {
+  display: inline-block; padding: 8px 14px; border-radius: 6px; cursor: pointer;
+  background: var(--destaque); color: #fff; font-weight: 600; font-size: .9rem;
+}
+.botao-arquivo.secundario { background: transparent; color: var(--destaque); border: 1px solid var(--destaque); }
+.arquivos input:focus-visible + .botao-arquivo, .botao-arquivo:focus-within { outline: 2px solid var(--foco); outline-offset: 2px; }
+
+.grade {
+  max-width: 1320px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 18px; align-items: start;
+}
+@media (max-width: 960px) { .grade { grid-template-columns: 1fr; } }
+.painel { background: var(--superficie); border: 1px solid var(--borda); border-radius: 8px; padding: 14px; }
+.lateral { display: flex; flex-direction: column; gap: 18px; }
+
+.palco { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #0B0F0D; border-radius: 6px; overflow: hidden; }
+.palco video, .palco canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.palco video { object-fit: fill; }
+canvas { display: block; max-width: 100%; }
+#tela-mapa { width: 100%; height: auto; border-radius: 6px; }
+
+.narracao { display: flex; gap: 12px; align-items: flex-start; padding: 14px 2px 6px; min-height: 4.2em; }
+.narracao p { margin: 0; font-size: clamp(1.05rem, 1.8vw, 1.3rem); line-height: 1.4; font-weight: 500; }
+.chip {
+  flex: none; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; background: var(--borda); color: var(--tinta);
+  margin-top: 3px;
+}
+.chip.finalizacao { background: #B8321F; color: #fff; }
+.chip.transicao { background: #8A5A00; color: #fff; }
+.chip.ataque { background: var(--destaque); color: #fff; }
+
+.controles { display: flex; align-items: center; gap: 12px; }
+.controles button {
+  width: 42px; height: 42px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--destaque); color: #fff; font-size: 1rem;
+}
+.controles input[type=range] { flex: 1; accent-color: var(--destaque); min-width: 0; }
+.relogio { font-variant-numeric: tabular-nums; color: var(--tinta-2); min-width: 4.5em; text-align: right; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
+
+.camadas, .confiabilidade { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.camadas span { display: block; color: var(--tinta-2); font-size: .9rem; margin-left: 1.6em; }
+.camadas input:disabled + strong { color: var(--suave); text-decoration: line-through; }
+.confiabilidade li { font-size: .9rem; color: var(--tinta-2); display: grid; grid-template-columns: 1.4em 1fr; }
+.confiabilidade .sim { color: var(--destaque); font-weight: 700; }
+.confiabilidade .nao { color: #B8321F; font-weight: 700; }
+.nota { margin: 10px 0 0; font-size: .82rem; color: var(--suave); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

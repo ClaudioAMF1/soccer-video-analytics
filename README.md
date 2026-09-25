@@ -1,103 +1,119 @@
-# Controle de espaço em futebol a partir de vídeo monocular
+# Do Pixel à Narrativa
 
-Repositório de pesquisa do artigo *Estimação de Controle de Espaço em Futebol a
-partir de Vídeo Monocular: o Impacto do Erro de Registro do Campo em Métricas
-Táticas*, produzido na disciplina de Processamento Inteligente de Imagens
-Aeroespaciais do IDP.
+Repositório de pesquisa do artigo *Do Pixel à Narrativa: Visualizações
+Confiáveis de Controle de Espaço em Transmissões de Futebol para o Público
+Geral* (IDP). Para uma visão geral do projeto, leia primeiro o
+[**resumo executivo**](RESUMO_EXECUTIVO.md).
 
 > **Trabalho derivado.** A base de detecção, rastreamento e classificação vem de
 > [tryolabs/soccer-video-analytics](https://github.com/tryolabs/soccer-video-analytics)
-> (MIT, 2022). Ver [`NOTICE.md`](NOTICE.md) para a delimitação exata do que foi
-> herdado e do que é contribuição própria. **Qualquer publicação derivada deve
-> citar o projeto original.**
+> (MIT, 2022). [`NOTICE.md`](NOTICE.md) delimita o que foi herdado e o que é
+> contribuição própria. **Qualquer publicação derivada deve citar o projeto
+> original.**
 
 ## A pergunta
 
-Modelos de controle de espaço quantificam qual equipe domina cada região do
-campo, mas dependem de rastreamento multicâmera disponível apenas a clubes
-profissionais. **É possível alimentá-los com vídeo de transmissão de câmera
-única — e quanto se perde ao fazê-lo?**
+Modelos de controle de espaço mostram qual equipe domina cada região do campo,
+mas dependem de rastreamento proprietário e quase não chegam ao público. **É
+possível estimá-los a partir de jogos gravados da TV e mostrá-los a
+espectadores leigos sem afirmar nada falso?**
 
-A peça que torna a pergunta respondível é o **registro do campo**. Métricas
-calculadas no plano da imagem variam com o zoom e o enquadramento da câmera, e
-não com o comportamento das equipes: a mesma formação, sem ninguém se mover,
-produz áreas de casco convexo completamente diferentes. Só após a projeção para
-o plano do gramado as grandezas passam a ser físicas — metros, metros por
-segundo, metros quadrados — e comparáveis entre lances, partidas e estudos.
+O projeto responde em três partes: mede quanto cada informação tática se
+distorce com o erro do vídeo de transmissão; usa essa medição para decidir o
+que pode ser exibido; e avalia, com pessoas, se a interface resultante melhora
+a compreensão do jogo.
 
-## Estrutura
+## Arquitetura
 
 ```
-pitch/          Registro do campo: modelo métrico, homografia (DLT + RANSAC),
-                perturbação controlada para a análise de sensibilidade
+ jogo gravado ──► 1. EXTRAÇÃO ──────────► JSON ──► 3. VISUALIZAÇÃO
+                  detecção, rastreamento,          player web sobre o vídeo
+                  registro do campo,        ▲
+                  posições em metros        │
+                                   2. NARRATIVA
+                                   estado da jogada, legenda,
+                                   regra do que é confiável exibir
+```
+
+```
+pitch/          Registro do campo: 29 marcos oficiais, homografia (DLT + RANSAC),
+                quadros-chave com propagação e reancoragem, perturbação (E5)
 controle/       Controle de espaço por tempo até a interceptação
-metrics/        Avaliação: erro de registro, Brier, top-k, log-loss
-soccer/         Lógica de jogo, métricas táticas em metros, camada de desenho
+narrativa/      Estados da jogada com histerese; regra de exibição
+exportacao/     Segunda passada da extração, formato JSON, jogada de demonstração
+soccer/         Posse de bola, métricas táticas em metros, camada de desenho
 inference/      Detecção (YOLOv8) e classificação de equipes (linha de base HSV)
-utils/          Funções de apoio ao pipeline
-experiments/    Protocolo experimental E1–E6
-paper/          O artigo e seu estado por seção
-tests/          Suíte de regressão (46 testes)
+metrics/        Erro de registro, Brier, top-k, log-loss
+experiments/    Protocolo E1 a E6 e o experimento E5, executável
+estudo/         Estudo com usuários: protocolo, TCLE, questionário, análise
+web/            Player (HTML, CSS, JavaScript, sem dependências)
+paper/          O artigo (.docx no modelo SBC) e suas figuras
+tests/          88 testes automatizados
+extrair.py      Etapa 1 sobre um jogo gravado
+anotar.py       Anotação manual dos quadros-chave
 ```
 
-A separação entre `soccer/metricas_taticas.py` (cálculo, em metros) e
-`soccer/visualizacao_tatica.py` (desenho, em pixels) é deliberada: nenhum número
-do artigo sai da camada de desenho.
-
-## Instalação
+## Como usar
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Uso
+**Ver o player funcionando, sem vídeo nem dados externos:**
 
-**Experimento E5** — sensibilidade ao erro de registro. Não depende do
-SoccerNet nem de GPU:
+```bash
+python -m exportacao.demo --saida web/dados/demo.json
+cd web && python -m http.server 8000
+# abrir http://localhost:8000
+```
+
+Acrescente `?estudo` ao endereço para o modo usado no estudo com usuários, que
+omite os percentuais da legenda.
+
+**Processar um jogo gravado:**
+
+```bash
+python anotar.py --video jogo.mp4 --quadros 0,250,500 --saida anotacoes.json
+python extrair.py --video jogo.mp4 --anotacoes anotacoes.json \
+    --equipes "Palmeiras,Inter Miami" --saida web/dados/jogo.json
+```
+
+Os nomes das equipes devem ser os mesmos de `config/filtros_cores.py`. Anote
+quadros-chave a cada 5 a 10 segundos e após cada corte de câmera, com ao menos
+seis marcos visíveis. O formato está em `exemplos/anotacoes_exemplo.json`.
+
+**Experimento E5 e análise do estudo:**
 
 ```bash
 python -m experiments.e5_sensibilidade --repeticoes 200 --saida resultados/
+python -m estudo.analise --simular 24        # demonstração com dados sintéticos
 ```
-
-**Vídeo anotado** — figura qualitativa do artigo:
-
-```bash
-python analise_video.py --video videos/partida.mp4 --tatico --homografia H.npy
-```
-
-Sem `--homografia`, a posse é decidida por limiar em pixels, que não é
-invariante à escala. É um modo degradado, e o programa avisa.
 
 **Testes:**
 
 ```bash
 pytest tests/ -q
+python web/verificar.py      # opcional: teste do player em navegador (exige Playwright)
 ```
 
 ## Situação
 
 | Componente | Situação |
 | :--- | :--- |
-| Modelo do campo e homografia | pronto e testado |
-| Controle de espaço | pronto e testado |
-| Métricas táticas em metros | pronto e testado |
-| Métricas de avaliação | pronto e testado |
-| E5 (sensibilidade) | **executável**, com resultado em [`experiments/README.md`](experiments/README.md) |
-| E1–E4, E6 | dependem do SoccerNet; a implementar |
+| Registro do campo, quadros-chave e reancoragem | pronto e testado |
+| Controle de espaço, posse, métricas em metros | pronto e testado |
+| Estados narrativos e regra de exibição | pronto e testado |
+| Exportação JSON e jogada de demonstração | pronto e testado |
+| Player web | pronto; testado em navegador real |
+| E5 (sensibilidade) | executável, com resultado em [`experiments/README.md`](experiments/README.md) |
+| Estudo com usuários (E6) | protocolo e análise prontos; falta a coleta |
+| E1 a E4 | dependem do SoccerNet |
 | Artigo | título, resumo, introdução e metodologia escritos |
 
-Os defeitos da versão anterior — entre eles a posse de bola que nunca se
-encerrava e a compactação medida em pixels — estão documentados em
-[`CHANGELOG.md`](CHANGELOG.md), com testes de regressão para cada um.
-
-## Dados
-
-Os experimentos E1–E4 e E6 usam o [SoccerNet Game State
-Reconstruction](https://github.com/SoccerNet/sn-gamestate), que fornece
-posições de referência em coordenadas do campo. É esse dado que permite
-estabelecer o teto de desempenho contra o qual a estimativa monocular é
-comparada. Vídeos e pesos de modelos não são versionados (ver `.gitignore`).
+`extrair.py` e `anotar.py` dependem de detector, vídeo e interface gráfica, e
+não foram executados no ambiente em que o restante foi testado. A lógica que
+eles alimentam (`exportacao/pipeline.py`) é testada com dados sintéticos.
 
 ## Licença
 
