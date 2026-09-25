@@ -1,4 +1,12 @@
-# soccer/visualizacao_tatica.py
+"""Camada de desenho das sobreposições táticas, no plano da imagem.
+
+Este módulo apenas *desenha*. O cálculo das métricas foi movido para
+`soccer/metricas_taticas.py`, que opera em coordenadas métricas do campo.
+
+A separação é deliberada: a área do casco convexo desenhado aqui está em
+pixels e varia com o zoom da câmera, servindo somente à comunicação visual.
+Qualquer número reportado no artigo vem de `metricas_taticas`, em metros.
+"""
 import numpy as np
 import PIL
 from PIL import ImageDraw

@@ -1,9 +1,24 @@
-# Arquivos de Mídia
+# Mídia e modelos (não versionados por tamanho)
 *.mp4
-
-# Modelos de Machine Learning
+*.avi
+*.mkv
 *.pt
 
-# Cache e arquivos gerados
+# Saídas de experimento
+resultados/
+*_out.mp4
+
+# Dados
+data/
+SoccerNet/
+
+# Python
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
 .ipynb_checkpoints/
+
+# Homografias calibradas (específicas de cada vídeo)
+*.npy

@@ -1,0 +1,19 @@
+# Versões fixadas para reprodutibilidade dos experimentos do artigo.
+# Python 3.10+
+
+# --- Núcleo numérico ---
+numpy==1.26.4
+scipy==1.13.1
+
+# --- Visão computacional ---
+opencv-python==4.10.0.84
+ultralytics==8.2.103
+norfair==2.2.1
+Pillow==10.4.0
+
+# --- Dados e avaliação ---
+pandas==2.2.2
+matplotlib==3.9.2
+
+# --- Testes ---
+pytest==8.3.3

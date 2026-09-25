@@ -36,14 +36,15 @@ class Desenho:
         desenhador.text((25, 18), "POSSE DE BOLA", fill="white", font=fonte_titulo)
         
         casa, fora = partida.time_casa, partida.time_visitante
-        
-        # Exibe "SEM POSSE" se nenhum time tiver o controle
-        if not partida.time_com_posse:
+
+        # As porcentagens acumuladas seguem visiveis mesmo sem controle no
+        # instante atual; o que muda e o rotulo de estado, nao o placar.
+        if partida.quadros_com_posse == 0:
             fonte_sem_posse = Desenho.obter_fonte(22)
             desenhador.text((90, 45), "SEM POSSE", fill=(200, 200, 200), font=fonte_sem_posse)
         else:
-            posse_casa = casa.obter_percentual_posse(partida.duracao_total_frames) * 100
-            posse_fora = fora.obter_percentual_posse(partida.duracao_total_frames) * 100
+            posse_casa = partida.percentual_posse(casa) * 100
+            posse_fora = partida.percentual_posse(fora) * 100
 
             desenhador.text((25, 45), f"{casa.abreviacao}", fill=casa.cor, font=fonte_time)
             desenhador.text((90, 45), f"{posse_casa:.1f}%", fill="white", font=fonte_time)

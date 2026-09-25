@@ -4,6 +4,8 @@ import PIL
 from PIL import ImageDraw
 from soccer.desenho import Desenho
 
+COR_SEM_POSSE = (255, 255, 255)
+
 class Bola:
     def __init__(self, detection):
         self.detection = detection
@@ -24,10 +26,10 @@ class Bola:
             self.detection.data["color"] = self.cor
 
     @property
-    def centro(self) -> tuple:
+    def centro(self) -> np.ndarray | None:
         if self.detection is None: return None
         x1, y1 = self.detection.points[0]; x2, y2 = self.detection.points[1]
-        return (np.round_((x1 + x2) / 2), np.round_((y1 + y2) / 2))
+        return np.array([(x1 + x2) / 2.0, (y1 + y2) / 2.0])
 
     def atualizar_rastro(self):
         if self.detection and self.rastro_habilitado and self.centro is not None:

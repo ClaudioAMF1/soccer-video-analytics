@@ -10,8 +10,9 @@ class Time:
         self.passes = []
 
     def obter_percentual_posse(self, duracao_total_frames: int) -> float:
-        if duracao_total_frames == 0: return 0
-        return round(self.posse_de_bola_frames / duracao_total_frames, 2)
+        if duracao_total_frames == 0:
+            return 0.0
+        return self.posse_de_bola_frames / duracao_total_frames
 
     def obter_tempo_posse_formatado(self, fps: int) -> str:
         segundos = round(self.posse_de_bola_frames / fps) if fps > 0 else 0
