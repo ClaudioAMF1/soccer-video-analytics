@@ -37,7 +37,8 @@ a compreensão do jogo.
 
 ```
 pitch/          Registro do campo: 29 marcos oficiais, homografia (DLT + RANSAC),
-                quadros-chave com propagação e reancoragem, perturbação (E5)
+                quadros-chave com propagação e reancoragem, perturbação (E5),
+                segmentação da transmissão em planos de câmera
 controle/       Controle de espaço por tempo até a interceptação
 narrativa/      Estados da jogada com histerese; regra de exibição
 exportacao/     Segunda passada da extração, formato JSON, jogada de demonstração
@@ -45,10 +46,10 @@ soccer/         Posse de bola, métricas táticas em metros, camada de desenho
 inference/      Detecção (YOLOv8) e classificação de equipes (linha de base HSV)
 metrics/        Erro de registro, Brier, top-k, log-loss
 experiments/    Protocolo E1 a E6 e o experimento E5, executável
-estudo/         Estudo com usuários: protocolo, TCLE, questionário, análise
+estudo/         Levantamento exploratório (formulário) e estudo com usuários
 web/            Player (HTML, CSS, JavaScript, sem dependências)
 paper/          O artigo (.docx no modelo SBC) e suas figuras
-tests/          88 testes automatizados
+tests/          93 testes automatizados
 extrair.py      Etapa 1 sobre um jogo gravado
 anotar.py       Anotação manual dos quadros-chave
 ```
@@ -74,12 +75,15 @@ omite os percentuais da legenda.
 **Processar um jogo gravado:**
 
 ```bash
+python -m pitch.planos --video jogo.mp4     # planos abertos e quadros-chave sugeridos
 python anotar.py --video jogo.mp4 --quadros 0,250,500 --saida anotacoes.json
 python extrair.py --video jogo.mp4 --anotacoes anotacoes.json \
     --equipes "Palmeiras,Inter Miami" --saida web/dados/jogo.json
 ```
 
-Os nomes das equipes devem ser os mesmos de `config/filtros_cores.py`. Anote
+A transmissão alterna entre câmeras; processe cada plano aberto separadamente,
+com `extrair.py --inicio/--fim`. Os nomes das equipes devem ser os mesmos de
+`config/filtros_cores.py`. Anote
 quadros-chave a cada 5 a 10 segundos e após cada corte de câmera, com ao menos
 seis marcos visíveis. O formato está em `exemplos/anotacoes_exemplo.json`.
 

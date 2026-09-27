@@ -1,5 +1,19 @@
 # Registro de alterações
 
+## Revisão do artigo conforme as notas do professor, 2026-09
+
+- Artigo reestruturado: seções sem numeração; Resumo antes do Abstract, com
+  citação, metodologia e resultado esperado; cinco palavras-chave; nova seção
+  "Concepções das regras do futebol"; metodologia em texto único, no futuro.
+- Introdução: citação de abertura, os motivos de as métricas não chegarem ao
+  público, exemplo técnico (valor esperado da posse) e a multiplicidade de
+  câmeras. Quatro referências novas, conferidas na fonte.
+- `pitch/planos.py`: segmentação da transmissão em planos de câmera (cortes
+  por distância de Bhattacharyya entre histogramas de cor; planos abertos pela
+  fração de gramado) e sugestão de quadros-chave.
+- `estudo/formulario_exploratorio.md`: levantamento sobre a dificuldade de
+  entender a tática na TV, para pessoas do meio do futebol e de fora dele.
+
 ## Fusão: medição + interface para o público geral, 2026-09
 
 O artigo passou a ter três contribuições encadeadas: medir o que é confiável a

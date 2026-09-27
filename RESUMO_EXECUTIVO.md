@@ -66,8 +66,10 @@ diferencia o nosso trabalho.
 | Máquina narrativa | Um defensor oscilando no limite faria um corte simples piscar mais de 100 vezes; a nossa troca de estado no máximo 2 |
 | Player web | Testado em navegador real, sem erros, funciona no celular |
 | Protocolo do estudo com usuários | Protocolo, termo de consentimento, questionário e análise estatística prontos |
-| Artigo | Título, resumo, introdução e metodologia escritos no modelo SBC |
-| Testes automatizados | 88 testes passando |
+| Artigo | Resumo, introdução, concepções das regras do futebol e metodologia, revisados conforme as notas do professor |
+| Segmentação da transmissão em planos | Separa planos abertos de closes e replays, por histograma de cor e proporção de gramado |
+| Formulário exploratório | Pronto para o Google Forms, com versões para quem é e quem não é do meio do futebol |
+| Testes automatizados | 93 testes passando |
 
 ## Primeiros resultados
 
@@ -109,14 +111,16 @@ de 50%. Com 18 perguntas, sobe para 83%. O protocolo já foi ajustado para 18.
 
 ## Próximos passos sugeridos
 
-1. **Confirmar com o professor** se o estudo com pessoas exige aprovação do
+1. **Divulgar o formulário exploratório** (`estudo/formulario_exploratorio.md`),
+   que é anônimo e pode começar antes de tudo; meta de 30 respostas por grupo.
+2. **Confirmar com o professor** se o estudo com pessoas exige aprovação do
    Comitê de Ética. Se exigir, a tramitação leva semanas: é o item de prazo
    mais longo.
-2. **Baixar o SoccerNet** e rodar o pipeline sobre uma sequência, para ver o
+3. **Baixar o SoccerNet** e rodar o pipeline sobre uma sequência, para ver o
    sistema funcionando com dados reais.
-3. **Anotar os quadros-chave** de um jogo gravado com `anotar.py` e gerar o
+4. **Anotar os quadros-chave** de um jogo gravado com `anotar.py` e gerar o
    primeiro arquivo real com `extrair.py`.
-4. **Selecionar os clipes** do estudo em paralelo aos experimentos.
+5. **Selecionar os clipes** do estudo em paralelo aos experimentos.
 
 ## Riscos
 
