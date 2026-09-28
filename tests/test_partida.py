@@ -132,3 +132,29 @@ def test_oscilacao_curta_nao_troca_a_posse(partida):
     _rodar(partida, [_JogadorFalso(casa, 1.0)], bola, 10)
     partida.atualizar([_JogadorFalso(fora, 1.0)], bola)
     assert partida.time_com_posse is casa
+
+
+def test_passe_nao_encerra_a_posse(partida):
+    """Com a bola em trânsito longe de todos, a equipe que passou mantém a posse."""
+    casa = partida.time_casa
+    _rodar(partida, [_JogadorFalso(casa, 1.0)], _BolaFalsa(), 10)
+    _rodar(partida, [_JogadorFalso(casa, 500.0)], _BolaFalsa(), 30)
+    assert partida.time_com_posse is casa
+
+
+def test_contatos_esparsos_do_adversario_nao_se_acumulam(partida):
+    """Toques isolados do adversário, separados por trânsito, não trocam a posse."""
+    casa, fora = partida.time_casa, partida.time_visitante
+    bola = _BolaFalsa()
+    _rodar(partida, [_JogadorFalso(casa, 1.0)], bola, 10)
+    for _ in range(10):
+        _rodar(partida, [_JogadorFalso(fora, 1.0)], bola, 2)
+        _rodar(partida, [_JogadorFalso(fora, 500.0)], bola, 3)
+    assert partida.time_com_posse is casa
+
+
+def test_em_metros_sem_homografia():
+    casa = Time("Casa", "CAS", (255, 0, 0))
+    fora = Time("Fora", "FOR", (0, 0, 255))
+    p = Partida(casa, fora, fps=30.0, em_metros=True, limiar_posse_m=2.0)
+    assert p.limiar_efetivo == 2.0

@@ -1,5 +1,64 @@
 # Registro de alterações
 
+## Revisão do artigo conforme as notas do professor, 2026-09
+
+- Artigo reestruturado: seções sem numeração; Resumo antes do Abstract, com
+  citação, metodologia e resultado esperado; cinco palavras-chave; nova seção
+  "Concepções das regras do futebol"; metodologia em texto único, no futuro.
+- Introdução: citação de abertura, os motivos de as métricas não chegarem ao
+  público, exemplo técnico (valor esperado da posse) e a multiplicidade de
+  câmeras. Quatro referências novas, conferidas na fonte.
+- `pitch/planos.py`: segmentação da transmissão em planos de câmera (cortes
+  por distância de Bhattacharyya entre histogramas de cor; planos abertos pela
+  fração de gramado) e sugestão de quadros-chave.
+- `estudo/formulario_exploratorio.md`: levantamento sobre a dificuldade de
+  entender a tática na TV, para pessoas do meio do futebol e de fora dele.
+
+## Fusão: medição + interface para o público geral, 2026-09
+
+O artigo passou a ter três contribuições encadeadas: medir o que é confiável a
+partir de jogos gravados da TV, usar essa medição para decidir o que exibir, e
+avaliar com pessoas se a interface melhora a compreensão. O processamento é
+offline, sobre jogos gravados.
+
+### Acrescentado
+
+- `pitch/propagacao.py`: registro do campo por quadros-chave anotados,
+  propagado pelo movimento de câmera e reancorado entre chaves. Em simulação
+  com deriva aleatória, a reancoragem reduz o erro médio em 41 %.
+- `pitch/modelo_campo.py`: oito marcos novos (círculo central e arcos das
+  áreas). Com a câmera no meio do campo, só três dos 21 marcos anteriores
+  ficavam visíveis, menos que os quatro exigidos.
+- `narrativa/estados.py`: estados da jogada (bola parada, disputa, construção,
+  ataque, transição, finalização) com faixa de histerese e confirmação
+  temporal, e legendas em linguagem comum.
+- `narrativa/confiabilidade.py`: regra de exibição a partir do E5.
+- `exportacao/`: segunda passada da extração, formato JSON documentado e jogada
+  sintética de demonstração que passa pelo pipeline real.
+- `extrair.py` e `anotar.py`: primeira passada sobre vídeo gravado e ferramenta
+  de anotação de quadros-chave.
+- `web/`: player narrativo, com modo de estudo (`?estudo`) sem percentuais.
+- `estudo/`: protocolo, TCLE, questionário e análise estatística do E6.
+- `RESUMO_EXECUTIVO.md`.
+
+### Corrigido
+
+- `soccer/partida.py`: com a bola em trânsito, a posse passava a "em disputa",
+  de modo que **todo passe encerrava a posse**. A equipe que passa a bola agora
+  a mantém até o adversário dominá-la. Novo parâmetro `em_metros`.
+- `narrativa/estados.py`: a equipe narrada mudava antes do estado ser
+  confirmado, e a legenda chegava a atribuir o ataque de uma equipe à outra.
+  Estado e equipe agora são confirmados juntos.
+
+### Alterado
+
+- O antigo E6 (custo computacional para tempo real) saiu do protocolo: com
+  processamento offline, não há exigência de tempo real. O E6 passa a ser o
+  estudo com usuários.
+- E5 refeito com os 29 marcos; conclusões inalteradas.
+- Artigo reescrito com o novo título e foco; agora cita Tryolabs (2022) como
+  base do código e não tem referências sem citação.
+
 ## Reorientação do repositório para a produção do artigo — 2026-09
 
 O repositório deixou de ser uma demonstração visual e passou a ser o

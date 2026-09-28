@@ -31,6 +31,8 @@ class Partida:
     """Agrega o estado de uma partida ao longo do vídeo.
 
     Args:
+        em_metros: força a interpretação das distâncias em metros mesmo sem
+            homografia, para quando os atletas já chegam com posições no campo.
         limiar_posse_m: distância, em metros, abaixo da qual se considera que
             o atleta controla a bola. Usado quando `homografia` é fornecida.
         limiar_posse_px: alternativa em pixels, usada apenas quando não há
@@ -50,6 +52,7 @@ class Partida:
         time_visitante: Time,
         fps: float,
         homografia: np.ndarray | None = None,
+        em_metros: bool | None = None,
         limiar_posse_m: float = 2.0,
         limiar_posse_px: float = 120.0,
         quadros_confirmacao: int = 3,
@@ -61,6 +64,7 @@ class Partida:
         self.fps = fps if fps and fps > 0 else 30.0
 
         self.homografia = homografia
+        self.em_metros = em_metros
         self.limiar_posse_m = limiar_posse_m
         self.limiar_posse_px = limiar_posse_px
         self.quadros_confirmacao = quadros_confirmacao
@@ -82,8 +86,13 @@ class Partida:
     # ------------------------------------------------------------------ #
     @property
     def limiar_efetivo(self) -> float:
-        """Limiar de posse na unidade em uso (metros ou pixels)."""
-        return self.limiar_posse_m if self.homografia is not None else self.limiar_posse_px
+        """Limiar de posse na unidade em uso (metros ou pixels).
+
+        Em metros quando há homografia, ou quando `em_metros=True` indica que as
+        distâncias já chegam medidas no plano do campo (caso do exportador).
+        """
+        usa_metros = self.em_metros if self.em_metros is not None else self.homografia is not None
+        return self.limiar_posse_m if usa_metros else self.limiar_posse_px
 
     def _distancia(self, jogador, bola: Bola) -> float:
         """Distância jogador-bola, em metros se houver homografia, senão em pixels."""
@@ -118,9 +127,14 @@ class Partida:
             self.jogador_mais_proximo = proximo
             self._registrar_candidato(proximo.time)
         else:
-            # A bola está em trânsito: ninguém a controla neste instante.
+            # Bola em trânsito (um passe, um chute): a posse não muda. No
+            # futebol, a equipe que passa a bola continua com a posse até que o
+            # adversário a domine; encerrá-la aqui faria cada passe aparecer
+            # como perda de posse. O candidato é descartado para que contatos
+            # esparsos, separados por trânsito, não se acumulem numa troca.
             self.jogador_mais_proximo = None
-            self._registrar_candidato(None)
+            self._candidato = None
+            self._quadros_candidato = 0
 
         self._contabilizar()
 

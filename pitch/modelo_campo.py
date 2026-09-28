@@ -22,6 +22,16 @@ DIST_MARCA_PENALTI = 11.0
 LARG_GOL = 7.32
 
 
+def _meia_corda_arco() -> float:
+    """Meia-corda do arco da grande área sobre a linha frontal da área.
+
+    O arco tem raio de 9,15 m centrado na marca de pênalti (a 11 m da linha de
+    fundo) e corta a linha frontal da área (a 16,5 m) a sqrt(9,15² - 5,5²) m
+    do eixo do campo.
+    """
+    return float(np.sqrt(RAIO_CIRCULO_CENTRAL ** 2 - (PROF_GRANDE_AREA - DIST_MARCA_PENALTI) ** 2))
+
+
 class ModeloCampo:
     """Pontos de referência do campo em coordenadas métricas.
 
@@ -81,6 +91,18 @@ class ModeloCampo:
             # Marcas de pênalti
             "penalti_esq": np.array([DIST_MARCA_PENALTI, meio_y]),
             "penalti_dir": np.array([c - DIST_MARCA_PENALTI, meio_y]),
+            # Círculo central: interseções com a linha de meio-campo e extremos.
+            # São os únicos pontos anotáveis quando a câmera enquadra o meio do
+            # campo, onde nenhum canto de área aparece.
+            "circulo_inf": np.array([c / 2.0, meio_y - RAIO_CIRCULO_CENTRAL]),
+            "circulo_sup": np.array([c / 2.0, meio_y + RAIO_CIRCULO_CENTRAL]),
+            "circulo_esq": np.array([c / 2.0 - RAIO_CIRCULO_CENTRAL, meio_y]),
+            "circulo_dir": np.array([c / 2.0 + RAIO_CIRCULO_CENTRAL, meio_y]),
+            # Arco da grande área: interseções com a linha frontal da área.
+            "arco_esq_inf": np.array([PROF_GRANDE_AREA, meio_y - _meia_corda_arco()]),
+            "arco_esq_sup": np.array([PROF_GRANDE_AREA, meio_y + _meia_corda_arco()]),
+            "arco_dir_inf": np.array([c - PROF_GRANDE_AREA, meio_y - _meia_corda_arco()]),
+            "arco_dir_sup": np.array([c - PROF_GRANDE_AREA, meio_y + _meia_corda_arco()]),
         }
 
     def marcos_array(self, nomes: list[str] | None = None) -> tuple[list[str], np.ndarray]:

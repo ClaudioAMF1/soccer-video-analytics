@@ -25,11 +25,15 @@ novembro de 2022, assinados por Diego Marvid, Diego Fernandez e Alan Descoins).
 
 ## O que é contribuição própria
 
-- `pitch/` — registro do campo e mudança de referencial para coordenadas métricas
-- `controle/` — modelo de controle de espaço (tempo até interceptação)
-- `metrics/` — avaliação quantitativa (erro de reprojeção, Brier, top-k)
-- `experiments/` — protocolo experimental do artigo
-- `soccer/metricas_taticas.py` — métricas táticas no plano do campo
+- `pitch/`: registro do campo, homografia, quadros-chave com reancoragem
+- `controle/`: modelo de controle de espaço (tempo até interceptação)
+- `narrativa/`: estados da jogada e regra de exibição
+- `exportacao/`, `extrair.py`, `anotar.py`: extração para JSON
+- `web/`: player narrativo
+- `estudo/`: estudo com usuários
+- `metrics/`: avaliação quantitativa (erro de reprojeção, Brier, top-k)
+- `experiments/`: protocolo experimental do artigo
+- `soccer/metricas_taticas.py`: métricas táticas no plano do campo
 - Migração do detector de YOLOv5 para YOLOv8
 - Correção dos defeitos documentados em `CHANGELOG.md`
 

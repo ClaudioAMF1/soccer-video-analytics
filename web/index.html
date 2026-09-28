@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leitura de Jogo</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<header class="topo">
+  <div>
+    <p class="rotulo">Controle de espaço em vídeo gravado</p>
+    <h1>Leitura de Jogo</h1>
+  </div>
+  <div class="arquivos">
+    <label class="botao-arquivo" for="entrada-json">Abrir dados (.json)</label>
+    <input id="entrada-json" type="file" accept=".json,application/json">
+    <label class="botao-arquivo secundario" for="entrada-video">Abrir vídeo (opcional)</label>
+    <input id="entrada-video" type="file" accept="video/*">
+  </div>
+</header>
+
+<main class="grade">
+  <section class="painel painel-video" aria-label="Transmissão com sobreposição">
+    <div class="palco" id="palco">
+      <video id="video" playsinline muted hidden></video>
+      <canvas id="tela-transmissao" width="1280" height="720"></canvas>
+    </div>
+    <div class="narracao" aria-live="polite">
+      <span class="chip" id="chip-estado">—</span>
+      <p id="legenda">Carregando a jogada…</p>
+    </div>
+    <div class="controles">
+      <button id="botao-tocar" type="button" aria-label="Reproduzir">▶</button>
+      <input id="linha-tempo" type="range" min="0" max="0" value="0" step="1" aria-label="Posição na jogada">
+      <span id="relogio" class="relogio">0,0 s</span>
+    </div>
+  </section>
+
+  <aside class="lateral">
+    <section class="painel" aria-label="Campo visto de cima">
+      <h2>Visto de cima</h2>
+      <canvas id="tela-mapa" width="1110" height="740"></canvas>
+      <p class="nota" id="nota-direcao"></p>
+    </section>
+
+    <section class="painel">
+      <h2>O que você está vendo</h2>
+      <ul class="camadas" id="camadas">
+        <li><label><input type="checkbox" id="camada-zonas" checked> <strong>Zonas de controle</strong></label>
+          <span>A cor no gramado mostra qual equipe chegaria primeiro àquele ponto. Quanto mais forte a cor, mais clara a vantagem.</span></li>
+        <li><label><input type="checkbox" id="camada-forma" checked> <strong>Forma da equipe</strong></label>
+          <span>O contorno liga os jogadores de linha. Contorno pequeno: time fechado. Contorno grande: time espalhado.</span></li>
+        <li><label><input type="checkbox" id="camada-atletas" checked> <strong>Jogadores e bola</strong></label>
+          <span>O anel marca quem está com a bola.</span></li>
+      </ul>
+    </section>
+
+    <section class="painel">
+      <h2>Por que algumas informações não aparecem</h2>
+      <ul class="confiabilidade" id="confiabilidade"></ul>
+      <p class="nota" id="origem"></p>
+    </section>
+  </aside>
+</main>
+
+<script src="player.js"></script>
+</body>
+</html>
