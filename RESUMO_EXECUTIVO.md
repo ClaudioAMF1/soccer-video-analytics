@@ -2,8 +2,9 @@
 
 **Projeto:** Do Pixel à Narrativa: Visualizações Confiáveis de Controle de
 Espaço em Transmissões de Futebol para o Público Geral
-**Equipe:** Claudio Meireles Filho, Felipe Pereira, Lucas Ungarelli, Pedro Araújo (IDP)
-**Situação em:** setembro de 2026
+**Equipe:** Claudio da Aparecida Meireles Filho, Felipe Pereira Dutra, Lucas Fiche
+Ungarelli Borges, Pedro Rodrigues de Araújo (IDP)
+**Situação em:** novembro de 2026, artigo final entregue (`paper/Artigo_Final.docx`)
 
 ## Em uma frase
 
@@ -71,56 +72,51 @@ diferencia o nosso trabalho.
 | Formulário exploratório | Pronto para o Google Forms, com versões para quem é e quem não é do meio do futebol |
 | Testes automatizados | 93 testes passando |
 
-## Primeiros resultados
+## Resultados sobre transmissões reais
 
-**1. Informação coletiva é muito mais robusta que individual.** Simulamos
-erros de medição de 0 a 3 metros e medimos quanto cada informação se distorce.
-Com limite de tolerância de 5%:
+Os experimentos rodaram sobre as **49 sequências de teste do SoccerNet-GSR**
+(36.750 quadros de transmissões reais, com a posição verdadeira de cada atleta
+anotada). Todos os números abaixo estão no artigo final.
 
-| Informação | Deixa de ser confiável a partir de |
+| O que foi medido | Resultado |
+| :--- | :--- |
+| Atletas que a câmera mostra por quadro | 13,0 em média, de 22 em campo |
+| Quadros com marcos suficientes para anotar o campo | 94% (4 marcos); 79% (6 ou mais) |
+| Erro ao usar uma única calibração para a sequência inteira | 17,3 m (a câmera se move muito) |
+| Erro do registro com um quadro-chave por segundo | **0,42 m** (mediana); 1,92 m no pior 10% |
+| Atletas encontrados pelo detector | 91% (só 60% dos pequenos, ao fundo) |
+| Detecções de pessoa que eram atletas | 87%; **93%** descartando quem está fora do gramado |
+| Quadros em que a bola foi localizada | 60% (a bola tem só 17 px) |
+| Trocas de posse por minuto, sem e com histerese | 14,0 → **6,0** |
+
+**O achado principal.** Com o limite de 5% de erro, cada visualização aguenta
+um erro de registro diferente:
+
+| Visualização | Aguenta até |
 | :--- | ---: |
-| Qual jogador domina cada ponto | 1,2 m de erro |
-| Forma da equipe | 2,0 m de erro |
-| Zonas de controle da equipe | não atingiu o limite até 2,9 m |
+| Área ocupada pela equipe | 0,54 m |
+| Qual jogador domina cada ponto | 0,65 m |
+| Largura da equipe | 0,92 m |
+| **Zonas de controle da equipe** | **mais de 2,4 m** |
 
-A informação individual se distorce cerca de **5 vezes mais rápido**. Por isso a
-interface mostra zonas e formas de equipe, e esconde "qual jogador domina cada
-ponto", explicando ao espectador o motivo.
+Como o registro erra até 1,92 m em 10% dos quadros, **só as zonas de controle
+são seguras para mostrar ao público**. A interface é coletiva por consequência
+da medição.
 
-**2. Anotar dois quadros vizinhos reduz o erro.** Combinar a estimativa das
-duas anotações mais próximas reduziu o erro médio de 0,85 m para 0,50 m (menos
-41%), em simulação.
-
-**3. O estudo precisa de mais perguntas, não só de mais pessoas.** Com 24
-participantes e 9 perguntas cada, a chance de detectar uma melhora real seria
-de 50%. Com 18 perguntas, sobe para 83%. O protocolo já foi ajustado para 18.
-
-> Esses números vêm de simulações. Servem para decidir o desenho do sistema e
-> do estudo, mas precisam ser confirmados com dados reais antes de entrarem no
-> artigo como resultado principal.
+**Duas simulações foram corrigidas pelos dados reais.** A forma da equipe é bem
+mais frágil do que a simulação indicava (0,5 a 0,9 m, contra 2 m), porque a
+câmera mostra só parte de cada time. E a reancoragem entre quadros-chave, que
+em simulação reduzia o erro em 41%, piorou os casos difíceis no vídeo real. O
+artigo reporta as duas coisas.
 
 ## O que falta
 
-| Item | Depende de |
+| Item | Situação |
 | :--- | :--- |
-| Baixar o SoccerNet e rodar os experimentos E1 a E4 com dados reais | acesso ao conjunto de dados (gratuito, exige cadastro) |
-| Medir o erro real de registro (E2), que define o que o player pode mostrar | E1 a E4 |
-| Selecionar os 12 clipes do estudo e definir o gabarito | jogos gravados + dois avaliadores |
-| Recrutar 24 participantes e aplicar o estudo | confirmação sobre o Comitê de Ética |
-| Escrever Resultados, Discussão e Conclusão | todos os itens acima |
-
-## Próximos passos sugeridos
-
-1. **Divulgar o formulário exploratório** (`estudo/formulario_exploratorio.md`),
-   que é anônimo e pode começar antes de tudo; meta de 30 respostas por grupo.
-2. **Confirmar com o professor** se o estudo com pessoas exige aprovação do
-   Comitê de Ética. Se exigir, a tramitação leva semanas: é o item de prazo
-   mais longo.
-3. **Baixar o SoccerNet** e rodar o pipeline sobre uma sequência, para ver o
-   sistema funcionando com dados reais.
-4. **Anotar os quadros-chave** de um jogo gravado com `anotar.py` e gerar o
-   primeiro arquivo real com `extrair.py`.
-5. **Selecionar os clipes** do estudo em paralelo aos experimentos.
+| Estudo com 24 espectadores | planejado em `estudo/`, não executado |
+| Formulário exploratório | pronto em `estudo/formulario_exploratorio.md`, não divulgado |
+| Avaliar a separação de planos de câmera | as sequências do SoccerNet-GSR não têm cortes |
+| Melhorar a detecção da bola | ajuste fino do detector com dados de futebol |
 
 ## Riscos
 
@@ -133,7 +129,7 @@ de 50%. Com 18 perguntas, sobe para 83%. O protocolo já foi ajustado para 18.
 
 ## Pendências da equipe
 
-- O modelo SBC pede e-mail dos autores, em fonte Courier New; a versão atual
-  mostra só a instituição.
-- Confirmar se a primeira entrega aceita a mudança de título e de foco em
-  relação à versão anterior do artigo.
+- Abrir `paper/Artigo_Final.docx` no Word e conferir a paginação (8 páginas no
+  LibreOffice, com cerca de um quarto da última página livre).
+- Decidir se o artigo deve trazer também o *Abstract* em inglês: não está na
+  lista de seções pedida e foi retirado para caber em 8 páginas.

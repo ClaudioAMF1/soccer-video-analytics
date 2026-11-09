@@ -1,5 +1,23 @@
 # Registro de alterações
 
+## Artigo final com avaliação sobre transmissões reais, 2026-11
+
+- **Dados reais.** Os experimentos passam a rodar sobre as 49 sequências de
+  teste do SoccerNet-GSR (36.750 quadros), obtidas do Hugging Face sem senha.
+  `experiments/soccernet.py` lê as anotações e converte as coordenadas.
+- **Novos experimentos:** `caracterizacao.py`, `e1_deteccao_real.py`,
+  `e2_registro_real.py`, `e5_real.py`, `narrativa_real.py` e
+  `figura_sensibilidade.py`.
+- **Achados que corrigem as simulações:** a forma da equipe é muito mais
+  frágil do que a simulação indicava (5 % de erro já com 0,5 a 0,9 m de erro de
+  registro, contra 2 m), e a reancoragem entre quadros-chave reduz a mediana do
+  erro mas piora a cauda, ao contrário do ganho de 41 % simulado.
+- **Artigo final** (`paper/Artigo_Final.docx`) no formato pedido: Times New
+  Roman 12, espaçamento 1,5, margens de 2,5 cm, referências ABNT, com
+  Fundamentação Teórica, Resultados e Discussão e Conclusão. Gerado por
+  `paper/gerar_artigo.py` a partir dos CSVs em `paper/dados/`, sem números
+  digitados à mão; `paper/reproduzir.sh` refaz tudo desde o download.
+
 ## Revisão do artigo conforme as notas do professor, 2026-09
 
 - Artigo reestruturado: seções sem numeração; Resumo antes do Abstract, com

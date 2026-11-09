@@ -49,7 +49,7 @@ experiments/    Protocolo E1 a E6 e o experimento E5, executável
 estudo/         Levantamento exploratório (formulário) e estudo com usuários
 web/            Player (HTML, CSS, JavaScript, sem dependências)
 paper/          O artigo (.docx no modelo SBC) e suas figuras
-tests/          93 testes automatizados
+tests/          96 testes automatizados
 extrair.py      Etapa 1 sobre um jogo gravado
 anotar.py       Anotação manual dos quadros-chave
 ```
@@ -105,19 +105,14 @@ python web/verificar.py      # opcional: teste do player em navegador (exige Pla
 
 | Componente | Situação |
 | :--- | :--- |
-| Registro do campo, quadros-chave e reancoragem | pronto e testado |
-| Controle de espaço, posse, métricas em metros | pronto e testado |
-| Estados narrativos e regra de exibição | pronto e testado |
-| Exportação JSON e jogada de demonstração | pronto e testado |
+| Artigo final | `paper/Artigo_Final.docx`, gerado de `paper/dados/` por `paper/gerar_artigo.py` |
+| Avaliação sobre transmissões reais | 49 sequências do SoccerNet-GSR: detecção, registro, sensibilidade, narrativa |
+| Registro do campo, controle de espaço, narrativa | prontos e testados |
 | Player web | pronto; testado em navegador real |
-| E5 (sensibilidade) | executável, com resultado em [`experiments/README.md`](experiments/README.md) |
-| Estudo com usuários (E6) | protocolo e análise prontos; falta a coleta |
-| E1 a E4 | dependem do SoccerNet |
-| Artigo | título, resumo, introdução e metodologia escritos |
+| Estudo com usuários | protocolo e análise prontos; coleta não realizada |
 
-`extrair.py` e `anotar.py` dependem de detector, vídeo e interface gráfica, e
-não foram executados no ambiente em que o restante foi testado. A lógica que
-eles alimentam (`exportacao/pipeline.py`) é testada com dados sintéticos.
+Resultados detalhados em [`experiments/README.md`](experiments/README.md);
+reprodução completa com `bash paper/reproduzir.sh`.
 
 ## Licença
 

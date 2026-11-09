@@ -1,5 +1,68 @@
 # Protocolo experimental
 
+## Resultados sobre transmissões reais (SoccerNet-GSR, artigo final)
+
+Todos os números do artigo final vêm destes scripts, executados sobre as 49
+sequências de teste do SoccerNet-GSR (36.750 quadros de 1920 × 1080 a 25 fps).
+Os CSVs estão em `paper/dados/`; `paper/reproduzir.sh` refaz tudo.
+
+| Script | O que mede |
+| :--- | :--- |
+| `caracterizacao.py` | atletas visíveis por quadro, presença da bola, resíduo da referência |
+| `e1_deteccao_real.py` | YOLOv8x COCO: revocação, precisão, filtro pelo campo, bola com e sem fatiamento |
+| `e2_registro_real.py` | erro do registro por quadros-chave, com fluxo óptico real |
+| `e5_real.py` | sensibilidade de cada métrica ao erro de registro, em configurações reais |
+| `narrativa_real.py` | estabilidade da posse e da legenda; validade do estado de finalização |
+| `figura_sensibilidade.py` | Figura 2 do artigo |
+
+### Registro por quadros-chave (E2)
+
+Anotação simulada: marcos visíveis projetados pela homografia de referência,
+com ruído de 2 px. Erro de posição dos atletas, mediana (percentil 90):
+
+| Intervalo | Sem propagação | Só chave anterior | Com reancoragem |
+| ---: | ---: | ---: | ---: |
+| 1 s | 1,65 m (11,9) | **0,42 m (1,92)** | 0,39 m (3,42) |
+| 2 s | 3,14 m (17,5) | 0,52 m (2,64) | 0,48 m (4,19) |
+| 5 s | 6,99 m (33,1) | 0,81 m (5,88) | 0,76 m (8,08) |
+
+Uma homografia única para a sequência erra 17,3 m (mediana). **A reancoragem
+reduz a mediana, mas piora a cauda**: quando a propagação a partir de uma das
+chaves falha, a média ponderada herda o erro. A simulação indicava ganho de
+41 %; o vídeo real não confirma. Uma salvaguarda que descarte a estimativa
+divergente fica como trabalho futuro, e deve ser calibrada na partição de
+validação, não no teste.
+
+### Sensibilidade sobre configurações reais (E5)
+
+1.285 quadros utilizáveis (1 por segundo), 4 repetições por nível de ruído.
+Erro de registro em que cada métrica atinge 5 % de erro relativo:
+
+| Métrica | Limite |
+| :--- | ---: |
+| Área de ocupação | 0,54 m |
+| Jogador dominante (identidade) | 0,65 m |
+| Profundidade | 0,77 m |
+| Largura | 0,92 m |
+| Controle de espaço da equipe | não atinge até 2,4 m (4,2 %) |
+
+**A simulação sintética abaixo superestimou a robustez da forma da equipe**
+(indicava 2 m). Com só cerca de seis atletas visíveis por equipe, o contorno
+depende de poucos pontos. O controle de espaço continua robusto.
+
+### Posse e narrativa
+
+Com ruído de registro de 1 m e oscilação de 0,2 m por atleta, a versão de
+corte único troca a posse 14,0 vezes por minuto; com histerese, 6,0. Estados
+de menos de meio segundo caem de 6,4 para 3,6 por minuto. O estado de
+finalização aparece em 8 de 13 sequências de chute (62 %) e em 11 de 36 demais
+(31 %): associação moderada, pois escanteios e faltas também levam a bola
+para perto do gol.
+
+---
+
+## Resultados anteriores com dados sintéticos
+
 O artigo tem três contribuições encadeadas, e cada experimento serve a uma:
 
 - **Medição** (E1 a E5): o que é confiável quando se parte de vídeo gravado de

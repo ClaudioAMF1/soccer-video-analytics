@@ -1,0 +1,1 @@
+quadros=1285 marcos_mediana=7 pct_4=94.5 pct_6=78.9

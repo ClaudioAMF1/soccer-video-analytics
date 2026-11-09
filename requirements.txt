@@ -15,5 +15,9 @@ Pillow==10.4.0
 pandas==2.2.2
 matplotlib==3.9.2
 
+# --- Experimentos sobre o SoccerNet-GSR e geração do artigo ---
+SoccerNet==0.2.0
+python-docx==1.2.0
+
 # --- Testes ---
 pytest==8.3.3

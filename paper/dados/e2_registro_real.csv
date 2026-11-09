@@ -1,0 +1,12 @@
+condicao,quadros,media_m,mediana_m,p90_m,pct_abaixo_1m,pct_abaixo_0_5m
+referencia_por_quadro,34231,0.148,0.103,0.255,99.1,97.0
+chaves_1s_reancorado,36307,1.193,0.388,3.417,73.6,58.6
+chaves_1s_so_anterior,36307,0.869,0.425,1.924,81.1,57.8
+chaves_1s_sem_propagacao,36307,6.28,1.649,11.931,38.9,23.9
+chaves_2s_reancorado,36307,1.622,0.481,4.187,69.2,51.4
+chaves_2s_so_anterior,36307,1.097,0.518,2.638,75.3,48.4
+chaves_2s_sem_propagacao,36307,6.672,3.141,17.481,27.2,16.6
+chaves_5s_reancorado,36307,3.273,0.762,8.084,58.1,35.8
+chaves_5s_so_anterior,36307,2.879,0.81,5.884,57.2,31.1
+chaves_5s_sem_propagacao,36307,12.045,6.993,33.087,16.4,9.7
+homografia_unica,29250,23.591,17.264,57.062,10.0,6.3

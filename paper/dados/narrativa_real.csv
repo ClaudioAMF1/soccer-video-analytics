@@ -1,0 +1,9 @@
+erro_m,versao,trocas_por_min,estados_curtos_por_min,trocas_posse_por_min,finalizacao_em_chutes,finalizacao_em_outros,pct_bola_morta,pct_disputa,pct_construcao,pct_ataque,pct_transicao,pct_finalizacao
+0.0,ingenua,21.2,5.8,7.9,5/13,10/36,9.6,14.6,28.1,22.0,24.0,1.7
+0.0,histerese,17.6,4.1,6.3,8/13,11/36,9.8,15.1,27.1,23.8,20.2,4.0
+0.5,ingenua,21.4,6.4,14.2,5/13,10/36,9.6,13.7,28.6,20.5,25.9,1.8
+0.5,histerese,17.3,3.7,6.0,6/13,9/36,9.8,14.8,29.7,23.1,20.1,2.5
+1.0,ingenua,21.5,6.4,14.0,5/13,10/36,9.6,13.7,28.6,20.4,25.9,1.8
+1.0,histerese,17.2,3.6,6.0,6/13,9/36,9.8,15.2,29.3,23.1,20.1,2.5
+2.0,ingenua,21.5,6.2,13.8,5/13,10/36,9.6,13.7,28.7,20.3,25.9,1.8
+2.0,histerese,17.3,3.7,6.0,6/13,9/36,9.8,15.2,29.4,22.9,20.2,2.6

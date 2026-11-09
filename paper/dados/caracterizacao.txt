@@ -1,0 +1,1 @@
+quadros=36750 atletas_por_quadro=12.96 pct_bola=90.4 residuo_ref_m=0.124 sequencias=49 tipos_evento=12

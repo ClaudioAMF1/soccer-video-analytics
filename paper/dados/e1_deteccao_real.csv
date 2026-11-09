@@ -1,0 +1,9 @@
+medida,valor_pct,n
+revocacao_atletas,90.7,6936
+revocacao_atletas_pequenos,59.8,281
+precisao_pessoas_sem_filtro,87.2,7216
+precisao_pessoas_filtro_campo,93.2,6637
+bola_localizada_quadro_inteiro,59.5,442
+bola_localizada_inteiro_subamostra,62.5,88
+bola_localizada_fatiado_subamostra,68.2,88
+tamanho_mediano_bola_px,17.0,442

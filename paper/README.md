@@ -1,59 +1,51 @@
 # Artigo
 
-`Artigo_Controle_de_Espaco_SBC.docx`, no modelo SBC.
+| Arquivo | O que é |
+| :--- | :--- |
+| `Artigo_Final.docx` | **Artigo final**, formato da disciplina (ABNT) |
+| `Artigo_Controle_de_Espaco_SBC.docx` | Primeira entrega (modelo SBC), mantida como histórico |
+| `gerar_artigo.py` | Gera o artigo final a partir de `dados/` |
+| `reproduzir.sh` | Refaz dados, figura e artigo desde o download do SoccerNet-GSR |
+| `dados/` | CSVs e fichas de todos os experimentos citados no texto |
+| `figuras/` | Figura 1 (protótipo) e Figura 2 (sensibilidade) |
 
 **Título.** Do Pixel à Narrativa: Visualizações Confiáveis de Controle de
 Espaço em Transmissões de Futebol para o Público Geral
 
-**Autores.** Claudio Meireles Filho, Felipe Pereira, Lucas Ungarelli, Pedro
-Araújo (IDP)
+**Autores.** Claudio da Aparecida Meireles Filho, Felipe Pereira Dutra, Lucas
+Fiche Ungarelli Borges, Pedro Rodrigues de Araújo (IDP)
 
-## Estrutura
+## Conferência dos requisitos
 
-Seções sem numeração, como pede a revisão: Introdução, Concepções das regras do
-futebol, Metodologia (texto único, sem subdivisões) e Referências. Resumo antes
-do Abstract; cinco palavras-chave em cada idioma.
-
-| Parte | Situação |
+| Requisito | Situação |
 | :--- | :--- |
-| Título, autores, instituição | pronto; faltam os e-mails, que o modelo SBC pede |
-| Resumo e Abstract | prontos: citação, metodologia e resultado esperado; 9 e 8 linhas, dentro do limite de 10 |
-| Introdução | pronta; abre com citação, explica por que as métricas não chegam ao público, dá um exemplo técnico e trata da multiplicidade de câmeras |
-| Concepções das regras do futebol | pronta: campo (Regra 1 da IFAB), posse, controle de espaço, fases do jogo |
-| Metodologia | pronta, com Figura 1 e Tabela 1 |
-| Resultados, Discussão, Conclusão | a escrever |
-| Referências | 17, todas citadas e conferidas na fonte |
+| Título, autores | sim |
+| Resumo | sim, com objetivo, método, resultados e conclusão; 100 a 250 palavras (NBR 6028) |
+| Palavras-chave (3 a 5) | 5, separadas por ponto e vírgula |
+| Introdução | sim |
+| Fundamentação Teórica | sim (inclui as concepções das regras do futebol) |
+| Metodologia | sim |
+| Resultados e Discussão | sim, sobre 49 sequências reais do SoccerNet-GSR |
+| Conclusão | sim, com limitações e trabalhos futuros |
+| Referências | ABNT NBR 6023, ordem alfabética, todas citadas no texto |
+| Entre 4 e 8 páginas | verificado renderizando o `.docx` |
+| Times New Roman 12 | sim; legendas e fontes de figura em 10 |
+| Espaçamento 1,5 | sim; resumo, legendas e referências em simples, como pede a ABNT |
+| Margens de 2,5 cm | sim, nos quatro lados |
 
-## Revisão aplicada (notas de setembro de 2026)
+## Como regenerar
 
-| Nota | Como foi atendida |
-| :--- | :--- |
-| Resumo com referência e metodologia | cita Spearman et al. (2017) e descreve as quatro etapas |
-| "Espera-se como resultado" | última frase do Resumo e do Abstract |
-| Até 5 palavras-chave, tirando controle de espaço | 5 em cada idioma; "controle de espaço" saiu (já está no título) |
-| Inverter Abstract e Resumo | Resumo primeiro |
-| Referência no início da introdução | Bialkowski et al. (2014) no primeiro parágrafo |
-| Por que as métricas não chegam ao público | três motivos: acesso, linguagem e formato da transmissão |
-| Algo muito técnico do futebol | controle de espaço e valor esperado da posse (Fernández et al., 2021) |
-| Multiplicidade de câmeras, câmera não fixa | parágrafo próprio, com os 13 tipos de câmera do SoccerNet-v2 |
-| Formulário sobre a dor | levantamento exploratório na metodologia; questionário em `estudo/formulario_exploratorio.md` |
-| Tirar numerações e o parágrafo "a Seção 2 descreve" | removidos |
-| Metodologia em texto único | sem subdivisões |
-| Antigo 2.3 como capítulo à parte | "Concepções das regras do futebol" |
-| Técnicas que serão aplicadas | metodologia escrita no futuro |
-| Tirar (i), (ii) | removidos |
+```bash
+python paper/gerar_artigo.py --dados paper/dados --saida paper/Artigo_Final.docx
+```
 
-## Figuras
+Nenhum número do texto é digitado à mão: alterar um resultado exige reexecutar
+o experimento correspondente e regenerar o artigo.
 
-- `figuras/prototipo_player.png`: Figura 1, gerada por
-  `python web/verificar.py --figura paper/figuras/prototipo_player.png`.
+## O que não está no artigo, e por quê
 
-## Ressalvas
-
-- A referência do SoccerNet-v2 (Deliège et al., 2021) está sem páginas: as
-  fontes divergem (4503-4514 ou 4508-4519, provavelmente a diferença entre a
-  paginação dos anais abertos e a do IEEE Xplore). Confira no IEEE Xplore
-  pelo acesso CAFe e acrescente, se quiser.
-- Abrir no Word e conferir a primeira página e a posição da Figura 1: a
-  formatação foi validada nas propriedades do arquivo, não numa página
-  renderizada.
+- **Estudo com usuários e formulário exploratório:** planejados (`estudo/`),
+  não executados. O artigo os apresenta como etapa seguinte e não afirma nada
+  sobre compreensão do espectador.
+- **Segmentação em planos de câmera:** implementada e testada com quadros
+  sintéticos, mas não avaliada: as sequências do SoccerNet-GSR não têm cortes.
